@@ -1,1 +1,10 @@
-Hello Test 
+# IST-300W Project
+
+This repository contains the **IST-300W project** which includes the setup for both the **frontend** and **middleware** servers used for the application.
+
+## Project Overview
+
+The project aims to develop a web application with the following components:
+
+- **Frontend**: A user-facing interface that interacts with the backend via API calls.
+- **Middleware**: An API layer that processes requests from the frontend and retrieves data from the backend.
