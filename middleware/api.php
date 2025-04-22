@@ -2,14 +2,15 @@
 header('Content-Type: application/json');
 
 // Database credentials
-$host = '172.31.23.222'; // ← use your DB server’s PRIVATE IP
+$host = '172.31.23.222';
 $dbname = 'instacart';
 $username = 'root';
-$password = ''; // Or your actual password if you created one
+$password = '';
 
 // Connect to DB
 $conn = new mysqli($host, $username, $password, $dbname);
 if ($conn->connect_error) {
+    http_response_code(500);
     echo json_encode(["status" => "error", "message" => "Database connection failed"]);
     exit;
 }
@@ -18,34 +19,24 @@ if ($conn->connect_error) {
 $item = isset($_GET['item']) ? $conn->real_escape_string($_GET['item']) : '';
 
 // Run query
-if ($item !== '') {
-    $sql = "SELECT * FROM quality_reports WHERE item LIKE '%$item%'";
-} else {
-    $sql = "SELECT * FROM quality_reports";
-}
+$sql = $item !== '' ?
+    "SELECT * FROM quality_reports WHERE item LIKE '%$item%'" :
+    "SELECT * FROM quality_reports";
 
 $result = $conn->query($sql);
 
+if (!$result) {
+    http_response_code(500);
+    echo json_encode(["status" => "error", "message" => "Query failed"]);
+    exit;
+}
+
 // Format and return JSON
-$data = ["items" => []];
-if ($result && $result->num_rows > 0) {
-    while ($row = $result->fetch_assoc()) {
-        $data["items"][] = $row;
-    }
+$data = ["status" => "success", "items" => []];
+while ($row = $result->fetch_assoc()) {
+    $data["items"][] = $row;
 }
 
 echo json_encode($data);
 $conn->close();
-?>
-<?php
-$data = [
-  "status" => "success",
-  "items" => [
-    ["item" => "Lettuce", "report" => "Wilted"],
-    ["item" => "Eggs", "report" => "Cracked"]
-  ]
-];
-
-header('Content-Type: application/json');
-echo json_encode($data);
 ?>
